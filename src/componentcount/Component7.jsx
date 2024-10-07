@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from "react";
 import { Maincom } from '../Structrue/Maincom'
 export const Component7 = () => {
   const codesnip = {
@@ -73,11 +73,66 @@ print(circle.draw())     # Output: Drawing a red circle with radius 5
 print(rectangle.draw())  # Output: Drawing a blue rectangle with width 3 and height 4
       
       `}
+
+        //  encript the url data
+  const lang = 'python';
+  const [encryptedURL, setEncryptedURL] = useState("");
+  const encryptAndEncodeURL = async (data, password) => {
+    const enc = new TextEncoder();
+    const encodedPassword = enc.encode(password);
+
+    const key = await crypto.subtle.importKey(
+      "raw",
+      encodedPassword,
+      { name: "PBKDF2" },
+      false,
+      ["deriveKey"]
+    );
+
+    const aesKey = await crypto.subtle.deriveKey(
+      {
+        name: "PBKDF2",
+        salt: enc.encode("some-salt"), 
+        iterations: 100000,
+        hash: "SHA-256"
+      },
+      key,
+      { name: "AES-GCM", length: 256 },
+      false,
+      ["encrypt", "decrypt"]
+    );
+
+    const iv = crypto.getRandomValues(new Uint8Array(12)); 
+    const encrypted = await crypto.subtle.encrypt(
+      {
+        name: "AES-GCM",
+        iv: iv
+      },
+      aesKey,
+      enc.encode(data)
+    );
+
+    const encryptedBase64 = btoa(String.fromCharCode(...new Uint8Array(encrypted)));
+    const ivBase64 = btoa(String.fromCharCode(...iv));
+    return { encryptedBase64, ivBase64 };
+  };
+  useEffect(() => {
+    const encryptData = async () => {
+      
+      const dataToEncrypt = "https://videos.sproutvideo.com/embed/4491d1b21613e1c8cd/c88103b34ff48db1";
+      const password = "guna-techy@codingGame";
+      const { encryptedBase64, ivBase64 } = await encryptAndEncodeURL(dataToEncrypt, password);
+      const finalEncryptedURL = `https://videoconsole-lac.vercel.app/?game=${encodeURIComponent(encryptedBase64)}&iv=${encodeURIComponent(ivBase64)}&lang=${lang}`;
+      setEncryptedURL(finalEncryptedURL);
+    };
+
+    encryptData(); 
+  }, []);
   return (
     <>
     <Maincom  title={"Inheritance"}
   game={"https://dineshdiv.github.io/clsloading-clspath/"}
-  url={'https://videoconsole-lac.vercel.app/?url=https://videos.sproutvideo.com/embed/d390d5b7191be7c25a/ee7a31474bba1545'}
+  url={encryptedURL}
     steps={['Inheritance is a fundamental concept in object-oriented programming (OOP) where a new class, known as a subclass or derived class, can inherit attributes and methods from an existing class, known as a superclass or base class. This allows for code reuse and facilitates the creation of hierarchical relationships between classes.',
     'Base Class Definition:',
     'Here, we define a base class Shape with an __init__() method to initialize the color of the shape and a draw() method, left unimplemented (using pass), as its specific behavior will be defined in subclasses. This represents the common attributes and behaviors shared by all shapes.',

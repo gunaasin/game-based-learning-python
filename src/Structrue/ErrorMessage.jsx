@@ -6,7 +6,7 @@ const ErrorMessage = () => {
 
     useEffect(() => {
         const handleResize = () => {
-            if (window.innerWidth <= 1366) {
+            if (window.innerWidth <= 1166) {
                 setIsErrorVisible(true); 
                 document.body.style.overflow = 'hidden';
             } else {
